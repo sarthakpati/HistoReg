@@ -5,13 +5,13 @@ name: CI Build and Run
 on: [push, pull_request]
 
 jobs:
-  pytest:
+  build:
 
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-18.04, windows-2019]
+        os: [ubuntu-18.04]
 
     # Timeout: https://stackoverflow.com/a/59076067/4521646
     timeout-minutes: 50
@@ -40,21 +40,13 @@ jobs:
         # performs installation and executable stripping
         make install/strip
 
-    - name: build for Windows
-      if: runner.os == 'windows'
-      run: |
-        cd bin
-        # this will build ITK as HistoReg needs
-        cmake ..
-        cmake --build . --target ALL_BUILD
-        ## wait for ITK to finish building
-        # this is for HistoReg
-        cmake -DITK_DIR=./ITK-build -DCMAKE_INSTALL_PREFIX=./install ..
-        cmake --build . --target ALL_BUILD
-        cmake --build . --target INSTALL
-
     - name: sample Run
       run: |
-        HistoReg_source=${pwd}
-        HistoReg_install=${pwd}/bin/install
-        ${HistoReg_install}/bin/HistoReg -m ${HistoReg_source}/Data/Images/CD68.jpg -f ${HistoReg_source}/Data/Images/CD4.jpg -o ${HistoReg_source}/Data/Output/ -l ${HistoReg_source}/Data/Landmarks/CD68.csv -S
+        pwd
+        echo "ls bin"
+        ls bin
+        echo "ls bin/install/"
+        ls bin/install/
+        echo "ls bin/install/bin/"
+        ls bin/install/bin
+        ./bin/install/bin/HistoReg -m ./Data/Images/CD68.jpg -f ./Data/Images/CD4.jpg -o ./Data/Output/ -l ./Data/Landmarks/CD68.csv -S
